@@ -14,7 +14,7 @@ int LEFT_SPEED = 250;
 int RIGHT_SPEED = 250;
 
 //Bluetooth stop
-#define CONECTION_DELAY 1000
+#define CONECTION_DELAY 5000
 unsigned long time_now=0, last_check=0;
 bool running = false;
 
@@ -24,23 +24,30 @@ bool running = false;
 void handleBluetoothStop();
 void handleCommand(String command);
 void handleConfig(String command);
-void spin();
+void spinWeapon(int power);
 
 
 //==========================================
 //MAIN PROGRAM
 
 void setup(){
-  Serial.begin(115200);
-  server.begin(NOMBRE_BLUETOOTH);
-  data.begin("SparkBot");
-  delay(500);
+    Serial.begin(115200);
+    server.begin(NOMBRE_BLUETOOTH);
+    data.begin("SparkBot");
+    delay(500);
 
-  LEFT_SPEED = data.getInt("L", 250);
-  RIGHT_SPEED = data.getInt("R", 250);
+    LEFT_SPEED = data.getInt("L", 250);
+    RIGHT_SPEED = data.getInt("R", 250);
 
-  motors.init(STNDBY_PIN, PWM_A, A1_PIN, A2_PIN, PWM_B, B1_PIN, B2_PIN);
-  Serial.println("Systems ready!\n");
+    //Init all motors
+    motors.init(STNDBY_PIN, PWM_A, A1_PIN, A2_PIN, PWM_B, B1_PIN, B2_PIN);
+
+    ledcSetup(WEAPON_CHANNEL, WEAPON_FREC, WEAPON_RES);
+    ledcAttachPin(WEAPON_PIN, WEAPON_CHANNEL);
+
+    ledcWrite(WEAPON_CHANNEL, MIN_POWER);
+    delay(2000);
+    Serial.println("Systems ready!\n");
 }
 
 
@@ -94,9 +101,14 @@ void handleCommand(String command){
       motors.controlMotors(LEFT_SPEED, -RIGHT_SPEED);
       Serial.println("Turning right!\n");
       break;
-    case 'Z':
-      spin();
-      break;
+    case 'W':
+        Serial.println("Activating weapon!\n");
+        spinWeapon(ATTACK_POWER);
+        break;
+    case 'w':
+        Serial.println("WEAPON OFF!\n");
+        spinWeapon(0);
+        break;
   //------------------------
   default:
       break;
@@ -106,16 +118,19 @@ void handleCommand(String command){
 
 void handleBluetoothStop(){
   if(running && (time_now-last_check) > CONECTION_DELAY){
+    Serial.println("Disconnect error stop!");
     motors.stopMotors();
     running = false;
+    ledcWrite(WEAPON_CHANNEL, MIN_POWER);
+    ledcDetachPin(WEAPON_CHANNEL);
   }
 }
 
 
-void spin(){
-  motors.controlMotors(LEFT_SPEED, -RIGHT_SPEED);
-  delay(1250);
-  motors.stopMotors();
+void spinWeapon(int power){
+    int duty_cycle = map(power, 0, 100, MIN_POWER, MAX_POWER);
+    ledcWrite(WEAPON_CHANNEL, duty_cycle);
+    Serial.println("Weapon PWM: " + String(duty_cycle));
 }
 
 
