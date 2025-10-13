@@ -9,13 +9,13 @@
 
 //Left motor
 #define PWM_A 32
-#define A1_PIN 5
-#define A2_PIN 17
+#define A1_PIN 17
+#define A2_PIN 5
 
 //Right motor
 #define PWM_B 13
-#define B1_PIN 18
-#define B2_PIN 19 
+#define B1_PIN 19
+#define B2_PIN 18
 
 // Weapon
 #define WEAPON_PIN 25
