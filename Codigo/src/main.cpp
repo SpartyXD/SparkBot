@@ -9,7 +9,7 @@ BluetoothSerial server;
 Preferences data;
 
 //VARIABLES
-#define NOMBRE_BLUETOOTH "SparkBot"
+#define NOMBRE_BLUETOOTH "Senku-Bot"
 int LEFT_SPEED = 250;
 int RIGHT_SPEED = 250;
 
@@ -33,7 +33,7 @@ void spinWeapon(int power);
 void setup(){
     Serial.begin(115200);
     server.begin(NOMBRE_BLUETOOTH);
-    data.begin("SparkBot");
+    data.begin("SenkuBot");
     delay(500);
 
     LEFT_SPEED = data.getInt("L", 250);

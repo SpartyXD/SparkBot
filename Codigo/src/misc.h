@@ -5,7 +5,7 @@
 
 //=====================================
 //PINS
-#define STNDBY_PIN 23 //Enable motors
+#define STNDBY_PIN 23 //Enable motors -> Puede ser 5V directo
 
 //Left motor
 #define PWM_A 32
